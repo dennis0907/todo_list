@@ -18,6 +18,7 @@ class CreateTodosTable extends Migration
             $table->string('title');
             $table->text('content');
             $table->boolean('finished')->default(false);
+            $table->date('todo_time')->nullable(false);
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
         });

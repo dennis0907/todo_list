@@ -13,9 +13,35 @@ class TodoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        //未提供資料數量則給10筆
+        $limit = $request->limit ?? 10;
+
+        $query = Todo::query();
+        //篩選欄位
+        if (isset($request->filters)) {
+            $filters = explode(',', $request->filters);
+            foreach ($filters as $key => $filter) {
+                list($key, $value) = explode(':', $filter);
+                $query->where($key, 'like', "%$value%");
+            }
+        }
+        //排列方式
+        if (isset($request->sorts)) {
+            $sorts = explode(',', $request->sorts);
+            foreach ($sorts as $key => $sort) {
+                list($key, $value) = explode(':', $sort);
+                if ($value == 'asc' || $value == 'desc') {
+                    $query->orderBy($key, $value);
+                }
+            }
+        } else {
+            $query->orderBy('id', 'desc');
+        }
+
+        $todo = $query->paginate($limit)->appends($request->query());
+        return response($todo, Response::HTTP_OK);
     }
 
     /**
@@ -49,7 +75,7 @@ class TodoController extends Controller
      */
     public function show(Todo $todo)
     {
-        //
+        return response($todo, Response::HTTP_OK);
     }
 
     /**
