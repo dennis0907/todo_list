@@ -83,6 +83,7 @@ class TodoController extends Controller
      */
     public function destroy(Todo $todo)
     {
-        //
+        $todo->delete();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }
