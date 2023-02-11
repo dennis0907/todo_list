@@ -173,5 +173,7 @@ return [
         'title'                 => '標題',
         'username'              => '使用者名字',
         'year'                  => '年',
+        'todo_time'             => '待辦事項日期',
+        'finished'              => '是否完成'
     ],
 ];
