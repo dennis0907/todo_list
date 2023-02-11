@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Todo;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Cache;
 
 class TodoController extends Controller
 {
@@ -15,16 +16,40 @@ class TodoController extends Controller
      */
     public function index(Request $request)
     {
+        //取得網址
+        $url = $request->url();
+        //取得參數
+        $queryParams = $request->query();
+        //將傳入參數固定排序
+        ksort($queryParams);
+        //將參數字串化
+        $queryString = http_build_query($queryParams);
+        //完整網址 ps:含參數
+        $fullUrl = "{$url}?{$queryString}";
+
+        //確認快取內是否有紀錄 如果有直接返回快取內資料
+        if (Cache::has($fullUrl)) {
+            return Cache::get($fullUrl);
+        }
         //未提供資料數量則給10筆
         $limit = $request->limit ?? 10;
 
         $query = Todo::query();
         //篩選欄位
-        if (isset($request->filters)) {
-            $filters = explode(',', $request->filters);
-            foreach ($filters as $key => $filter) {
-                list($key, $value) = explode(':', $filter);
-                $query->where($key, 'like', "%$value%");
+        // if (isset($request->filters)) {
+        //     $filters = explode(',', $request->filters);
+        //     foreach ($filters as $key => $filter) {
+        //         list($key, $value) = explode(':', $filter);
+        //         $query->where($key, 'like', "%$value%");
+        //     }
+        // }
+        //篩選日期
+        if (isset($request->date)) {
+            $date = $request->date;
+            if ( $date == 'today') {
+                $query->where('todo_time', date("Y-m-d"));
+            }else {
+                $query->where('todo_time', $date);
             }
         }
         //排列方式
@@ -41,7 +66,10 @@ class TodoController extends Controller
         }
 
         $todo = $query->paginate($limit)->appends($request->query());
-        return response($todo, Response::HTTP_OK);
+        //返回todo 前將 fullUrl存入快取60s
+        return Cache::remember($fullUrl, 60, function() use ($todo) {
+            return response($todo, Response::HTTP_OK);
+        });
     }
 
     /**

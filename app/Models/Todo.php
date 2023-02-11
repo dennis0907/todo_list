@@ -15,6 +15,7 @@ class Todo extends Model
         'title',
         'content',
         'finished',
+        'todo_time',
         'user_id'
     ];
 }
