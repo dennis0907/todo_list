@@ -46,9 +46,9 @@ class TodoController extends Controller
         //篩選日期
         if (isset($request->date)) {
             $date = $request->date;
-            if ( $date == 'today') {
+            if ($date == 'today') {
                 $query->where('todo_time', date("Y-m-d"));
-            }else {
+            } else {
                 $query->where('todo_time', $date);
             }
         }
@@ -67,7 +67,7 @@ class TodoController extends Controller
 
         $todo = $query->paginate($limit)->appends($request->query());
         //返回todo 前將 fullUrl存入快取60s
-        return Cache::remember($fullUrl, 60, function() use ($todo) {
+        return Cache::remember($fullUrl, 60, function () use ($todo) {
             return response($todo, Response::HTTP_OK);
         });
     }
@@ -90,6 +90,14 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'title' => 'required|string|max:10',
+            'content' => 'nullable|string|max:255',
+            'finished' => 'nullable|boolean',
+            'todo_time' => 'required|date'
+        ]);
+
+        $request['user_id'] = rand(1, 5);
         $todo = Todo::create($request->all());
         $todo = $todo->refresh();
         return response($todo, Response::HTTP_CREATED);
@@ -126,6 +134,13 @@ class TodoController extends Controller
      */
     public function update(Request $request, Todo $todo)
     {
+        $this->validate($request, [
+            'title' => 'nullable|string|max:10',
+            'content' => 'nullable|string|max:255',
+            'finished' => 'nullable|boolean',
+            'todo_time' => 'nullable|date'
+        ]);
+        // $request['user_id'] = rand(1, 5);
         $todo->update($request->all());
         return response($todo, Response::HTTP_OK);
     }
