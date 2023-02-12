@@ -22,6 +22,7 @@ class TodoFactory extends Factory
             'content' => $this->faker->text,
             'finished' => $this->faker->boolean,
             'todo_time' => $this->faker->dateTimeThisYear(),
+            'type_id' => $this->faker->numberBetween(1,3),
             'user_id' => User::all()->random()->id
         ];
     }

@@ -19,7 +19,8 @@ class CreateTodosTable extends Migration
             $table->text('content')->nullable(true);
             $table->boolean('finished')->default(false);
             $table->date('todo_time')->nullable(false);
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable(false);
+            $table->unsignedBigInteger('type_id')->nullable(false);
             $table->timestamps();
         });
     }
