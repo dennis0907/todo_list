@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\TodoResource;
 use App\Models\Todo;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Type;
 
 class TodoController extends Controller
 {
@@ -111,7 +113,7 @@ class TodoController extends Controller
      */
     public function show(Todo $todo)
     {
-        return response($todo, Response::HTTP_OK);
+        return new TodoResource($todo);
     }
 
     /**
