@@ -13,4 +13,9 @@ class Type extends Model
         'name',
         'sort'
     ];
+
+    public function todos()
+    {
+        return $this->hasMany('App\Models\Todo', 'type_id', 'id');
+    }
 }
